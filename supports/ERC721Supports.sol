@@ -7,25 +7,7 @@ import "../auth/Master.sol";
 import "../token/metadata/ERC721Metadata.sol";
 import "../library/Merkle.sol";
 
-contract ERC721Supports is IERC165, Master, ERC721Metadata {
-    event Withdrawal(address operator, address receiver, uint256 value);
-
-    constructor()
-        ERC721Metadata("ERC721 Token", "ERC721", "cid/prereveal.json")
-        Master(msg.sender)
-    {}
-
-    receive() external payable {}
-
-    fallback() external payable {}
-
-    function withdraw(address _to) public master {
-        uint256 balance = address(this).balance;
-        (bool success, ) = payable(_to).call{value: address(this).balance}("");
-        require(success, "MyERC20Token: ether transfer failed");
-        emit Withdrawal(msg.sender, _to, balance);
-    }
-
+abstract contract ERC721Supports is IERC165, Master, ERC721Metadata {
     function supportsInterface(bytes4 interfaceId)
         public
         pure
