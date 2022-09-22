@@ -61,4 +61,4 @@ npm install @0xver/solver
 These contracts were inspired by or directly modified from many sources, primarily:
 
 - [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts)
-- [Solmate](https://github.com/gnosis/gp-v2-contracts)
+- [Solmate](https://github.com/transmissions11/solmate)
