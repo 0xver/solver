@@ -11,6 +11,7 @@ abstract contract ERC721Supports is IERC165, Master, ERC721Metadata {
     function supportsInterface(bytes4 interfaceId)
         public
         pure
+        virtual
         override(IERC165)
         returns (bool)
     {
