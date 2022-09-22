@@ -14,87 +14,6 @@ contract ERC721 is IERC721, IERC721Errors {
     mapping(uint256 => address) private _getApproved;
     mapping(address => mapping(address => bool)) private _isApprovedForAll;
 
-    function _safeMint(address _to, uint96 _quantity) internal virtual {
-        _safeMint(_to, _quantity, "");
-    }
-
-    function _safeMint(
-        address _to,
-        uint96 _quantity,
-        bytes memory _data
-    ) internal virtual {
-        if (!_onERC721Received(address(0), _to, _currentId, _data)) {
-            revert TransferToNonERC721Receiver(_to);
-        }
-        _unsafeMint(_to, _quantity);
-    }
-
-    function _mint(address _to, uint96 _quantity) internal virtual {
-        if (tx.origin != msg.sender) {
-            revert TxOriginNonSender(tx.origin, msg.sender);
-        }
-        _unsafeMint(_to, _quantity);
-    }
-
-    function _unsafeMint(address _to, uint96 _quantity) private {
-        if (_to == address(0)) {
-            revert TransferTokenToZeroAddress(_currentId + 1, _to);
-        }
-        unchecked {
-            _balanceOf[_to] += _quantity;
-        }
-        for (uint256 i = 0; i < _quantity; i = _unchecked(i)) {
-            _loop(_to, _currentId + i + 1);
-        }
-        _currentId += _quantity;
-    }
-
-    function _unchecked(uint256 i) private pure returns (uint256) {
-        unchecked {
-            return i + 1;
-        }
-    }
-
-    function _loop(address _to, uint256 _id) private {
-        _ownerOf[_id] = _to;
-        _mintHook(_id);
-        emit Transfer(address(0), _to, _id);
-    }
-
-    function _burn(address _from, uint256 _tokenId) internal virtual {
-        if (!_isApprovedOrOwner(msg.sender, _tokenId)) {
-            revert NonApprovedNonOwner(
-                _isApprovedForAll[_ownerOf[_tokenId]][msg.sender],
-                _getApproved[_tokenId],
-                msg.sender,
-                _ownerOf[_tokenId]
-            );
-        }
-        if (_ownerOf[_tokenId] != _from) {
-            revert TransferFromNonOwner(msg.sender, _ownerOf[_tokenId]);
-        }
-        delete _getApproved[_tokenId];
-        unchecked {
-            _balanceOf[_from] -= 1;
-        }
-        _ownerOf[_tokenId] = address(0);
-        _subtractId += 1;
-        _burnHook(_tokenId);
-        emit Transfer(_from, address(0), _tokenId);
-    }
-
-    function _exists(uint256 _tokenId) internal view virtual returns (bool) {
-        return _ownerOf[_tokenId] != address(0);
-    }
-
-    function _currentTokenId() internal view virtual returns (uint256) {
-        return _currentId;
-    }
-
-    function totalSupply() public view virtual returns (uint256) {
-        return (_currentId - _subtractId);
-    }
-
     function balanceOf(address _owner)
         public
         view
@@ -201,6 +120,20 @@ contract ERC721 is IERC721, IERC721Errors {
         return _isApprovedForAll[_owner][_operator];
     }
 
+    function totalSupply() public view virtual returns (uint256) {
+        return (_currentId - _subtractId);
+    }
+
+    function _mintHook(uint256 _tokenId) internal virtual {}
+
+    function _burnHook(uint256 _tokenId) internal virtual {}
+
+    function _transferHook(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    ) internal virtual {}
+
     function _isApprovedOrOwner(address _spender, uint256 _tokenId)
         internal
         view
@@ -234,6 +167,83 @@ contract ERC721 is IERC721, IERC721Errors {
         emit Transfer(_from, _to, _tokenId);
     }
 
+    function _exists(uint256 _tokenId) internal view virtual returns (bool) {
+        return _ownerOf[_tokenId] != address(0);
+    }
+
+    function _currentTokenId() internal view virtual returns (uint256) {
+        return _currentId;
+    }
+
+    function _safeMint(address _to, uint96 _quantity) internal virtual {
+        _safeMint(_to, _quantity, "");
+    }
+
+    function _safeMint(
+        address _to,
+        uint96 _quantity,
+        bytes memory _data
+    ) internal virtual {
+        if (!_onERC721Received(address(0), _to, _currentId, _data)) {
+            revert TransferToNonERC721Receiver(_to);
+        }
+        _unsafeMint(_to, _quantity);
+    }
+
+    function _mint(address _to, uint96 _quantity) internal virtual {
+        if (tx.origin != msg.sender) {
+            revert TxOriginNonSender(tx.origin, msg.sender);
+        }
+        _unsafeMint(_to, _quantity);
+    }
+
+    function _burn(address _from, uint256 _tokenId) internal virtual {
+        if (!_isApprovedOrOwner(msg.sender, _tokenId)) {
+            revert NonApprovedNonOwner(
+                _isApprovedForAll[_ownerOf[_tokenId]][msg.sender],
+                _getApproved[_tokenId],
+                msg.sender,
+                _ownerOf[_tokenId]
+            );
+        }
+        if (_ownerOf[_tokenId] != _from) {
+            revert TransferFromNonOwner(msg.sender, _ownerOf[_tokenId]);
+        }
+        delete _getApproved[_tokenId];
+        unchecked {
+            _balanceOf[_from] -= 1;
+        }
+        _ownerOf[_tokenId] = address(0);
+        _subtractId += 1;
+        _burnHook(_tokenId);
+        emit Transfer(_from, address(0), _tokenId);
+    }
+
+    function _unchecked(uint256 i) private pure returns (uint256) {
+        unchecked {
+            return i + 1;
+        }
+    }
+
+    function _unsafeMint(address _to, uint96 _quantity) private {
+        if (_to == address(0)) {
+            revert TransferTokenToZeroAddress(_currentId + 1, _to);
+        }
+        unchecked {
+            _balanceOf[_to] += _quantity;
+        }
+        for (uint256 i = 0; i < _quantity; i = _unchecked(i)) {
+            _loop(_to, _currentId + i + 1);
+        }
+        _currentId += _quantity;
+    }
+
+    function _loop(address _to, uint256 _id) private {
+        _ownerOf[_id] = _to;
+        _mintHook(_id);
+        emit Transfer(address(0), _to, _id);
+    }
+
     function _onERC721Received(
         address _from,
         address _to,
@@ -263,14 +273,4 @@ contract ERC721 is IERC721, IERC721Errors {
             return true;
         }
     }
-
-    function _mintHook(uint256 _tokenId) internal virtual {}
-
-    function _burnHook(uint256 _tokenId) internal virtual {}
-
-    function _transferHook(
-        address _from,
-        address _to,
-        uint256 _tokenId
-    ) internal virtual {}
 }
