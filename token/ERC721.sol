@@ -9,6 +9,7 @@ import "../interface/receiver/IERC721Receiver.sol";
 contract ERC721 is IERC721, IERC721Errors {
     uint256 private _currentId;
     uint256 private _subtractId;
+    uint256 private _reentrant;
     mapping(address => uint256) private _balanceOf;
     mapping(uint256 => address) private _ownerOf;
     mapping(uint256 => address) private _getApproved;
@@ -52,8 +53,8 @@ contract ERC721 is IERC721, IERC721Errors {
             revert NonApprovedNonOwner(
                 _isApprovedForAll[_ownerOf[_tokenId]][msg.sender],
                 _getApproved[_tokenId],
-                msg.sender,
-                _ownerOf[_tokenId]
+                _ownerOf[_tokenId],
+                msg.sender
             );
         }
         _transfer(_from, _to, _tokenId);
@@ -69,8 +70,8 @@ contract ERC721 is IERC721, IERC721Errors {
             revert NonApprovedNonOwner(
                 _isApprovedForAll[_ownerOf[_tokenId]][msg.sender],
                 _getApproved[_tokenId],
-                msg.sender,
-                _ownerOf[_tokenId]
+                _ownerOf[_tokenId],
+                msg.sender
             );
         }
         _transfer(_from, _to, _tokenId);
@@ -82,7 +83,7 @@ contract ERC721 is IERC721, IERC721Errors {
         override(IERC721)
     {
         if (_ownerOf[_tokenId] != msg.sender) {
-            revert NonOwnerApproval(msg.sender, _ownerOf[_tokenId]);
+            revert NonOwnerApproval(_ownerOf[_tokenId], msg.sender);
         }
         _getApproved[_tokenId] = _approved;
         emit Approval(msg.sender, _approved, _tokenId);
@@ -94,7 +95,7 @@ contract ERC721 is IERC721, IERC721Errors {
         override(IERC721)
     {
         if (msg.sender == _operator) {
-            revert ApproveOwnerAsOperator(msg.sender, _operator);
+            revert ApproveOwnerAsOperator(_operator, msg.sender);
         }
         _isApprovedForAll[msg.sender][_operator] = _approved;
         emit ApprovalForAll(msg.sender, _operator, _approved);
@@ -152,7 +153,7 @@ contract ERC721 is IERC721, IERC721Errors {
         uint256 _tokenId
     ) internal virtual {
         if (_ownerOf[_tokenId] != _from) {
-            revert TransferFromNonOwner(msg.sender, _ownerOf[_tokenId]);
+            revert TransferFromNonOwner(_ownerOf[_tokenId], msg.sender);
         }
         if (_to == address(0)) {
             revert TransferTokenToZeroAddress(_tokenId, _to);
@@ -175,22 +176,39 @@ contract ERC721 is IERC721, IERC721Errors {
         return _currentId;
     }
 
-    function _safeMint(address _to, uint96 _quantity) internal virtual {
-        _safeMint(_to, _quantity, "");
+    function _safeMint(address _to, uint256 _tokenId) internal virtual {
+        _safeMint(_to, _tokenId, "");
     }
 
     function _safeMint(
         address _to,
-        uint96 _quantity,
+        uint256 _tokenId,
         bytes memory _data
     ) internal virtual {
-        if (!_onERC721Received(address(0), _to, _currentId, _data)) {
+        if (_reentrant == 1) {
+            revert ReentrantCaller(tx.origin, msg.sender);
+        }
+        _reentrant = 1;
+        if (_exists(_tokenId)) {
+            revert TokenIdExists(_tokenId);
+        }
+        if (!_onERC721Received(address(0), _to, _tokenId, _data)) {
             revert TransferToNonERC721Receiver(_to);
         }
-        _unsafeMint(_to, _quantity);
+        if (_to == address(0)) {
+            revert TransferTokenToZeroAddress(_tokenId, _to);
+        }
+        unchecked {
+            _balanceOf[_to] += 1;
+            _currentId += 1;
+        }
+        _ownerOf[_tokenId] = _to;
+        _mintHook(_tokenId);
+        emit Transfer(address(0), _to, _tokenId);
+        _reentrant = 0;
     }
 
-    function _mint(address _to, uint96 _quantity) internal virtual {
+    function _mint(address _to, uint256 _quantity) internal virtual {
         if (tx.origin != msg.sender) {
             revert TxOriginNonSender(tx.origin, msg.sender);
         }
@@ -202,19 +220,19 @@ contract ERC721 is IERC721, IERC721Errors {
             revert NonApprovedNonOwner(
                 _isApprovedForAll[_ownerOf[_tokenId]][msg.sender],
                 _getApproved[_tokenId],
-                msg.sender,
-                _ownerOf[_tokenId]
+                _ownerOf[_tokenId],
+                msg.sender
             );
         }
         if (_ownerOf[_tokenId] != _from) {
-            revert TransferFromNonOwner(msg.sender, _ownerOf[_tokenId]);
+            revert TransferFromNonOwner(_ownerOf[_tokenId], msg.sender);
         }
         delete _getApproved[_tokenId];
+        _ownerOf[_tokenId] = address(0);
         unchecked {
             _balanceOf[_from] -= 1;
+            _subtractId += 1;
         }
-        _ownerOf[_tokenId] = address(0);
-        _subtractId += 1;
         _burnHook(_tokenId);
         emit Transfer(_from, address(0), _tokenId);
     }
@@ -225,23 +243,23 @@ contract ERC721 is IERC721, IERC721Errors {
         }
     }
 
-    function _unsafeMint(address _to, uint96 _quantity) private {
+    function _unsafeMint(address _to, uint256 _quantity) private {
         if (_to == address(0)) {
             revert TransferTokenToZeroAddress(_currentId + 1, _to);
-        }
-        unchecked {
-            _balanceOf[_to] += _quantity;
         }
         for (uint256 i = 0; i < _quantity; i = _unchecked(i)) {
             _loop(_to, _currentId + i + 1);
         }
-        _currentId += _quantity;
+        unchecked {
+            _balanceOf[_to] += _quantity;
+            _currentId += _quantity;
+        }
     }
 
-    function _loop(address _to, uint256 _id) private {
-        _ownerOf[_id] = _to;
-        _mintHook(_id);
-        emit Transfer(address(0), _to, _id);
+    function _loop(address _to, uint256 _tokenId) private {
+        _ownerOf[_tokenId] = _to;
+        _mintHook(_tokenId);
+        emit Transfer(address(0), _to, _tokenId);
     }
 
     function _onERC721Received(
