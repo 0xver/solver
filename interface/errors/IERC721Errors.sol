@@ -8,17 +8,21 @@ interface IERC721Errors {
     error NonApprovedNonOwner(
         bool _isApprovedForAll,
         address _getApproved,
-        address _caller,
-        address _owner
+        address _owner,
+        address _caller
     );
 
-    error NonOwnerApproval(address _caller, address _owner);
+    error NonOwnerApproval(address _owner, address _caller);
 
-    error ApproveOwnerAsOperator(address _caller, address _operator);
+    error ApproveOwnerAsOperator(address _operator, address _caller);
 
-    error TransferFromNonOwner(address _caller, address _owner);
+    error TransferFromNonOwner(address _owner, address _caller);
 
     error TransferToNonERC721Receiver(address _contract);
 
+    error TokenIdExists(uint256 _tokenId);
+
     error TxOriginNonSender(address _origin, address _caller);
+
+    error ReentrantCaller(address _origin, address _caller);
 }
