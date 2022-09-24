@@ -9,7 +9,6 @@ import "../interface/receiver/IERC721Receiver.sol";
 contract ERC721 is IERC721, IERC721Errors {
     uint256 private _currentId;
     uint256 private _subtractId;
-    uint256 private _reentrant;
     mapping(address => uint256) private _balanceOf;
     mapping(uint256 => address) private _ownerOf;
     mapping(uint256 => address) private _getApproved;
@@ -176,36 +175,15 @@ contract ERC721 is IERC721, IERC721Errors {
         return _currentId;
     }
 
-    function _safeMint(address _to, uint256 _tokenId) internal virtual {
-        _safeMint(_to, _tokenId, "");
+    function _safeMint(address _to) internal virtual {
+        _safeMint(_to, "");
     }
 
-    function _safeMint(
-        address _to,
-        uint256 _tokenId,
-        bytes memory _data
-    ) internal virtual {
-        if (_reentrant == 1) {
-            revert ReentrantCaller(tx.origin, msg.sender);
-        }
-        _reentrant = 1;
-        if (_exists(_tokenId)) {
-            revert TokenIdExists(_tokenId);
-        }
-        if (!_onERC721Received(address(0), _to, _tokenId, _data)) {
+    function _safeMint(address _to, bytes memory _data) internal virtual {
+        _unsafeMint(_to, 1);
+        if (!_onERC721Received(address(0), _to, _currentId, _data)) {
             revert TransferToNonERC721Receiver(_to);
         }
-        if (_to == address(0)) {
-            revert TransferTokenToZeroAddress(_tokenId, _to);
-        }
-        unchecked {
-            _balanceOf[_to] += 1;
-            _currentId += 1;
-        }
-        _ownerOf[_tokenId] = _to;
-        _mintHook(_tokenId);
-        emit Transfer(address(0), _to, _tokenId);
-        _reentrant = 0;
     }
 
     function _mint(address _to, uint256 _quantity) internal virtual {
@@ -237,20 +215,11 @@ contract ERC721 is IERC721, IERC721Errors {
         emit Transfer(_from, address(0), _tokenId);
     }
 
-    function _unchecked(uint256 i) private pure returns (uint256) {
-        unchecked {
-            return i + 1;
-        }
-    }
-
     function _unsafeMint(address _to, uint256 _quantity) private {
-        if (_to == address(0)) {
-            revert TransferTokenToZeroAddress(_currentId + 1, _to);
-        }
-        for (uint256 i = 0; i < _quantity; i = _unchecked(i)) {
-            _loop(_to, _currentId + i + 1);
-        }
         unchecked {
+            for (uint256 i = 0; i < _quantity; i++) {
+                _loop(_to, _currentId + i + 1);
+            }
             _balanceOf[_to] += _quantity;
             _currentId += _quantity;
         }

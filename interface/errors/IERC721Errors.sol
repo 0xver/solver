@@ -20,9 +20,5 @@ interface IERC721Errors {
 
     error TransferToNonERC721Receiver(address _contract);
 
-    error TokenIdExists(uint256 _tokenId);
-
     error TxOriginNonSender(address _origin, address _caller);
-
-    error ReentrantCaller(address _origin, address _caller);
 }
