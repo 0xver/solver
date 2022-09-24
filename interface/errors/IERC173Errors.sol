@@ -3,7 +3,7 @@
 pragma solidity ^0.8.4;
 
 interface IERC173Errors {
-    error TransferRoleToZeroAddress(address _newMaster);
+    error NonMaster(address _master, address _caller);
 
-    error CallerIsNonContractOwner(address _master);
+    error TransferMasterToZeroAddress(address _master, address _newMaster);
 }

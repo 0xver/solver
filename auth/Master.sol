@@ -14,7 +14,7 @@ contract Master is IERC173, IERC173Errors {
 
     modifier master() {
         if (owner() != msg.sender) {
-            revert CallerIsNonContractOwner(owner());
+            revert NonMaster(owner(), msg.sender);
         }
         _;
     }
@@ -30,7 +30,7 @@ contract Master is IERC173, IERC173Errors {
         master
     {
         if (_newMaster == address(0)) {
-            revert TransferRoleToZeroAddress(_newMaster);
+            revert TransferMasterToZeroAddress(owner(), _newMaster);
         }
         _transferOwnership(_newMaster);
     }
