@@ -3,8 +3,6 @@
 pragma solidity ^0.8.4;
 
 interface IERC721Errors {
-    error TransferTokenToZeroAddress(uint256 _tokenId, address _to);
-
     error NonApprovedNonOwner(
         bool _isApprovedForAll,
         address _getApproved,
@@ -14,9 +12,11 @@ interface IERC721Errors {
 
     error NonOwnerApproval(address _owner, address _caller);
 
-    error ApproveOwnerAsOperator(address _operator, address _caller);
-
-    error TransferFromNonOwner(address _owner, address _caller);
+    error TransferTokenToZeroAddress(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    );
 
     error TransferToNonERC721Receiver(address _contract);
 
