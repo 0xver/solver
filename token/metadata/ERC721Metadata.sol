@@ -64,7 +64,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             _description,
             '"'
         );
-        string memory extension = _extension(_tokenId);
+        string memory extension = _ext(_tokenId);
         bytes memory data = abi.encodePacked("{", _core, extension, "}");
         if (ownerOf(_tokenId) == address(0)) {
             return "INVALID_ID";
@@ -77,32 +77,6 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
                     )
                 );
         }
-    }
-
-    function _extension(uint256 _tokenId)
-        internal
-        view
-        virtual
-        returns (string memory)
-    {
-        string memory extension;
-        if (_status[_tokenId] == 0) {
-            if (
-                keccak256(abi.encodePacked(_defaultExtension)) ==
-                keccak256(abi.encodePacked(""))
-            ) {
-                delete extension;
-            } else {
-                extension = string(abi.encodePacked(",", _defaultExtension));
-            }
-        } else if (_status[_tokenId] == 1) {
-            extension = string(
-                abi.encodePacked(",", _customExtension[_tokenId])
-            );
-        } else {
-            delete extension;
-        }
-        return extension;
     }
 
     function _setExtension(string memory _json, uint256 _tokenId)
@@ -120,5 +94,33 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         } else {
             _status[_tokenId] = 2;
         }
+    }
+
+    function _extension(uint256 _tokenId)
+        internal
+        view
+        virtual
+        returns (string memory)
+    {
+        return string(abi.encodePacked(",", _customExtension[_tokenId]));
+    }
+
+    function _ext(uint256 _tokenId) private view returns (string memory) {
+        string memory extension;
+        if (_status[_tokenId] == 0) {
+            if (
+                keccak256(abi.encodePacked(_defaultExtension)) ==
+                keccak256(abi.encodePacked(""))
+            ) {
+                delete extension;
+            } else {
+                extension = string(abi.encodePacked(",", _defaultExtension));
+            }
+        } else if (_status[_tokenId] == 1) {
+            extension = _extension(_tokenId);
+        } else {
+            delete extension;
+        }
+        return extension;
     }
 }
