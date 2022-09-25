@@ -123,16 +123,16 @@ contract ERC721 is IERC721, IERC721Errors {
         uint256 _tokenId
     ) internal virtual {}
 
-    function _isApprovedOrOwner(address _spender, uint256 _tokenId)
+    function _isApprovedOrOwner(address _caller, uint256 _tokenId)
         internal
         view
         virtual
         returns (bool)
     {
         address tokenOwner = _ownerOf[_tokenId];
-        return (_spender == tokenOwner ||
-            _isApprovedForAll[tokenOwner][_spender] ||
-            _getApproved[_tokenId] == _spender);
+        return (_caller == tokenOwner ||
+            _isApprovedForAll[tokenOwner][_caller] ||
+            _getApproved[_tokenId] == _caller);
     }
 
     function _transfer(
@@ -159,10 +159,6 @@ contract ERC721 is IERC721, IERC721Errors {
         _ownerOf[_tokenId] = _to;
         _transferHook(_from, _to, _tokenId);
         emit Transfer(_from, _to, _tokenId);
-    }
-
-    function _exists(uint256 _tokenId) internal view virtual returns (bool) {
-        return _ownerOf[_tokenId] != address(0);
     }
 
     function _totalMinted() internal view virtual returns (uint256) {
