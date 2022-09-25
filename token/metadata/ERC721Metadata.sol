@@ -64,24 +64,8 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             _description,
             '"'
         );
-        string memory _extension;
-        if (_status[_tokenId] == 0) {
-            if (
-                keccak256(abi.encodePacked(_defaultExtension)) ==
-                keccak256(abi.encodePacked(""))
-            ) {
-                delete _extension;
-            } else {
-                _extension = string(abi.encodePacked(",", _defaultExtension));
-            }
-        } else if (_status[_tokenId] == 1) {
-            _extension = string(
-                abi.encodePacked(",", _customExtension[_tokenId])
-            );
-        } else {
-            delete _extension;
-        }
-        bytes memory data = abi.encodePacked("{", _core, _extension, "}");
+        string memory extension = _extension(_tokenId);
+        bytes memory data = abi.encodePacked("{", _core, extension, "}");
         if (ownerOf(_tokenId) == address(0)) {
             return "INVALID_ID";
         } else {
@@ -93,6 +77,32 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
                     )
                 );
         }
+    }
+
+    function _extension(uint256 _tokenId)
+        internal
+        view
+        virtual
+        returns (string memory)
+    {
+        string memory extension;
+        if (_status[_tokenId] == 0) {
+            if (
+                keccak256(abi.encodePacked(_defaultExtension)) ==
+                keccak256(abi.encodePacked(""))
+            ) {
+                delete extension;
+            } else {
+                extension = string(abi.encodePacked(",", _defaultExtension));
+            }
+        } else if (_status[_tokenId] == 1) {
+            extension = string(
+                abi.encodePacked(",", _customExtension[_tokenId])
+            );
+        } else {
+            delete extension;
+        }
+        return extension;
     }
 
     function _setExtension(string memory _json, uint256 _tokenId)
