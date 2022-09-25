@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 library Merkle {
     function verify(
@@ -20,10 +20,8 @@ library Merkle {
         for (uint256 i = 0; i < proof.length; i++) {
             bytes32 proofElement = proof[i];
             if (computedHash <= proofElement) {
-                // Hash(current computed hash + current element of the proof)
                 computedHash = _efficientHash(computedHash, proofElement);
             } else {
-                // Hash(current element of the proof + current computed hash)
                 computedHash = _efficientHash(proofElement, computedHash);
             }
         }
