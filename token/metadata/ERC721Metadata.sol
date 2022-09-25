@@ -11,22 +11,21 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
     string private _name;
     string private _symbol;
     string private _description;
-    string private _defaultImage;
-    string private _defaultAnimation;
+    string private _defaultExtension;
+    mapping(uint256 => string) private _customExtension;
+    mapping(uint256 => uint256) private _status;
 
     constructor(
         string memory name_,
         string memory symbol_,
         string memory description_,
-        string memory defaultImage_,
-        // Use "" to void animation_url property
-        string memory defaultAnimation_
+        // Use "" to void extended json and exclude {}
+        string memory extension_
     ) {
         _name = name_;
         _symbol = symbol_;
         _description = description_;
-        _defaultImage = defaultImage_;
-        _defaultAnimation = defaultAnimation_;
+        _defaultExtension = extension_;
     }
 
     function name()
@@ -56,42 +55,35 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         override(IERC721Metadata)
         returns (string memory)
     {
-        bytes memory _animation;
-        if (
-            keccak256(abi.encodePacked(_defaultAnimation)) !=
-            keccak256(abi.encodePacked(""))
-        ) {
-            _animation = abi.encodePacked(
-                '"animation_url":"',
-                _defaultAnimation,
-                '",'
-            );
-        } else {
-            delete _animation;
-        }
-        bytes memory data = abi.encodePacked(
-            '{"name":"',
+        bytes memory _core = abi.encodePacked(
+            '"name":"',
             name(),
             " #",
             Strings.toString(_tokenId),
             '","description":"',
             _description,
-            '","image":"',
-            _defaultImage,
-            '",',
-            _animation,
-            '"attributes":[{"trait_type":"Owner","value":"',
-            Strings.toHexString(ownerOf(_tokenId)),
-            '"},{"trait_type":"Balance","value":"',
-            Strings.toString(balanceOf(ownerOf(_tokenId))),
-            '"},{"trait_type":"Approved","value":"',
-            Strings.toHexString(getApproved(_tokenId)),
-            '"},{"trait_type":"Timestamp","value":"',
-            Strings.toString(block.timestamp),
-            '"}]}'
+            '"'
         );
+        string memory _extension;
+        if (_status[_tokenId] == 0) {
+            if (
+                keccak256(abi.encodePacked(_defaultExtension)) ==
+                keccak256(abi.encodePacked(""))
+            ) {
+                delete _extension;
+            } else {
+                _extension = string(abi.encodePacked(",", _defaultExtension));
+            }
+        } else if (_status[_tokenId] == 1) {
+            _extension = string(
+                abi.encodePacked(",", _customExtension[_tokenId])
+            );
+        } else {
+            delete _extension;
+        }
+        bytes memory data = abi.encodePacked("{", _core, _extension, "}");
         if (ownerOf(_tokenId) == address(0)) {
-            return "Invalid ID";
+            return "INVALID_ID";
         } else {
             return
                 string(
@@ -100,6 +92,23 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
                         Base64.encode(data)
                     )
                 );
+        }
+    }
+
+    function _setExtension(string memory _json, uint256 _tokenId)
+        internal
+        virtual
+    {
+        if (
+            keccak256(abi.encodePacked(_json)) !=
+            keccak256(abi.encodePacked(""))
+        ) {
+            _customExtension[_tokenId] = _json;
+            if (_status[_tokenId] != 1) {
+                _status[_tokenId] = 1;
+            }
+        } else {
+            _status[_tokenId] = 2;
         }
     }
 }
