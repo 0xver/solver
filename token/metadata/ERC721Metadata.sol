@@ -13,7 +13,6 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
     string private _description;
     string private _defaultExtension;
     mapping(uint256 => string) private _customExtension;
-    mapping(uint256 => uint256) private _status;
 
     constructor(
         string memory name_,
@@ -83,17 +82,16 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         internal
         virtual
     {
-        if (
-            keccak256(abi.encodePacked(_json)) !=
-            keccak256(abi.encodePacked(""))
-        ) {
-            _customExtension[_tokenId] = _json;
-            if (_status[_tokenId] != 1) {
-                _status[_tokenId] = 1;
-            }
-        } else {
-            _status[_tokenId] = 2;
-        }
+        _customExtension[_tokenId] = _json;
+    }
+
+    function _customIdExtension(uint256 _tokenId)
+        internal
+        view
+        virtual
+        returns (string memory)
+    {
+        return _customExtension[_tokenId];
     }
 
     function _extension(uint256 _tokenId)
@@ -102,12 +100,15 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         virtual
         returns (string memory)
     {
-        return string(abi.encodePacked(",", _customExtension[_tokenId]));
+        return string(abi.encodePacked(",", _customIdExtension(_tokenId)));
     }
 
     function _ext(uint256 _tokenId) private view returns (string memory) {
         string memory extension;
-        if (_status[_tokenId] == 0) {
+        if (
+            keccak256(abi.encodePacked(_customExtension[_tokenId])) ==
+            keccak256(abi.encodePacked(""))
+        ) {
             if (
                 keccak256(abi.encodePacked(_defaultExtension)) ==
                 keccak256(abi.encodePacked(""))
@@ -116,10 +117,8 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             } else {
                 extension = string(abi.encodePacked(",", _defaultExtension));
             }
-        } else if (_status[_tokenId] == 1) {
-            extension = _extension(_tokenId);
         } else {
-            delete extension;
+            extension = _extension(_tokenId);
         }
         return extension;
     }
