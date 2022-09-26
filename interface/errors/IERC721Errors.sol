@@ -7,10 +7,10 @@ interface IERC721Errors {
         bool _isApprovedForAll,
         address _getApproved,
         address _owner,
-        address _caller
+        address _sender
     );
 
-    error NonOwnerApproval(address _owner, address _caller);
+    error NonOwnerApproval(address _owner, address _sender);
 
     error TransferTokenToZeroAddress(
         address _from,
@@ -20,5 +20,5 @@ interface IERC721Errors {
 
     error TransferToNonERC721Receiver(address _contract);
 
-    error TxOriginNonSender(address _origin, address _caller);
+    error TxOriginNonSender(address _origin, address _sender);
 }
