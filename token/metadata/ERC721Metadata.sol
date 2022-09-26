@@ -10,20 +10,17 @@ import "../../library/Base64.sol";
 contract ERC721Metadata is ERC721, IERC721Metadata {
     string private _name;
     string private _symbol;
-    string private _description;
     string private _defaultExtension;
     mapping(uint256 => string) private _customExtension;
 
+    /// @dev Exclude {} from extension_ and use "" to void
     constructor(
         string memory name_,
         string memory symbol_,
-        string memory description_,
-        // Use "" to void extended json and exclude {}
         string memory extension_
     ) {
         _name = name_;
         _symbol = symbol_;
-        _description = description_;
         _defaultExtension = extension_;
     }
 
@@ -54,17 +51,24 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         override(IERC721Metadata)
         returns (string memory)
     {
-        bytes memory _core = abi.encodePacked(
-            '"name":"',
-            name(),
-            " #",
-            Strings.toString(_tokenId),
-            '","description":"',
-            _description,
-            '"'
-        );
-        string memory extension = _ext(_tokenId);
-        bytes memory data = abi.encodePacked("{", _core, extension, "}");
+        bytes memory core = _corePacked(_tokenId);
+        bytes memory extension;
+        if (
+            keccak256(abi.encodePacked(_customExtension[_tokenId])) ==
+            keccak256(abi.encodePacked(""))
+        ) {
+            if (
+                keccak256(abi.encodePacked(_defaultExtension)) ==
+                keccak256(abi.encodePacked(""))
+            ) {
+                delete extension;
+            } else {
+                extension = abi.encodePacked(",", _defaultExtension);
+            }
+        } else {
+            extension = _extensionPacked(_tokenId);
+        }
+        bytes memory data = abi.encodePacked("{", core, extension, "}");
         if (ownerOf(_tokenId) == address(0)) {
             return "INVALID_ID";
         } else {
@@ -78,14 +82,32 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         }
     }
 
-    function _setExtension(string memory _json, uint256 _tokenId)
+    function _corePacked(uint256 _tokenId)
         internal
+        view
         virtual
+        returns (bytes memory)
     {
-        _customExtension[_tokenId] = _json;
+        return
+            abi.encodePacked(
+                '"name":"',
+                name(),
+                " #",
+                Strings.toString(_tokenId),
+                '"'
+            );
     }
 
-    function _customIdExtension(uint256 _tokenId)
+    function _extensionPacked(uint256 _tokenId)
+        internal
+        view
+        virtual
+        returns (bytes memory)
+    {
+        return abi.encodePacked(",", _customExtensionMap(_tokenId));
+    }
+
+    function _customExtensionMap(uint256 _tokenId)
         internal
         view
         virtual
@@ -94,32 +116,11 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         return _customExtension[_tokenId];
     }
 
-    function _extension(uint256 _tokenId)
+    /// @dev Exclude {} from _json and use "" to void
+    function _setExtension(string memory _json, uint256 _tokenId)
         internal
-        view
         virtual
-        returns (string memory)
     {
-        return string(abi.encodePacked(",", _customIdExtension(_tokenId)));
-    }
-
-    function _ext(uint256 _tokenId) private view returns (string memory) {
-        string memory extension;
-        if (
-            keccak256(abi.encodePacked(_customExtension[_tokenId])) ==
-            keccak256(abi.encodePacked(""))
-        ) {
-            if (
-                keccak256(abi.encodePacked(_defaultExtension)) ==
-                keccak256(abi.encodePacked(""))
-            ) {
-                delete extension;
-            } else {
-                extension = string(abi.encodePacked(",", _defaultExtension));
-            }
-        } else {
-            extension = _extension(_tokenId);
-        }
-        return extension;
+        _customExtension[_tokenId] = _json;
     }
 }
