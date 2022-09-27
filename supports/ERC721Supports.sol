@@ -5,7 +5,6 @@ pragma solidity ^0.8.4;
 import "../interface/IERC165.sol";
 import "../auth/Master.sol";
 import "../token/metadata/ERC721Metadata.sol";
-import "../library/Merkle.sol";
 
 abstract contract ERC721Supports is IERC165, Master, ERC721Metadata {
     function supportsInterface(bytes4 interfaceId)
