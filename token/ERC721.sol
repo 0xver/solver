@@ -129,9 +129,8 @@ contract ERC721 is IERC721, IERC721Errors {
         virtual
         returns (bool)
     {
-        address tokenOwner = _ownerOf[_tokenId];
-        return (_caller == tokenOwner ||
-            _isApprovedForAll[tokenOwner][_caller] ||
+        return (_ownerOf[_tokenId] == _caller ||
+            _isApprovedForAll[_ownerOf[_tokenId]][_caller] ||
             _getApproved[_tokenId] == _caller);
     }
 
