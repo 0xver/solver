@@ -63,10 +63,10 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             ) {
                 delete extension;
             } else {
-                extension = abi.encodePacked(",", _defaultExtension);
+                extension = abi.encodePacked(",", _defaultExtensionPacked());
             }
         } else {
-            extension = abi.encodePacked(",", _extensionPacked(_tokenId));
+            extension = abi.encodePacked(",", _customExtensionPacked(_tokenId));
         }
         bytes memory data = abi.encodePacked("{", core, extension, "}");
         if (ownerOf(_tokenId) == address(0)) {
@@ -98,7 +98,16 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             );
     }
 
-    function _extensionPacked(uint256 _tokenId)
+    function _defaultExtensionPacked()
+        internal
+        view
+        virtual
+        returns (bytes memory)
+    {
+        return abi.encodePacked(_defaultExtensionMap());
+    }
+
+    function _customExtensionPacked(uint256 _tokenId)
         internal
         view
         virtual
