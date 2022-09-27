@@ -13,7 +13,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
     string private _defaultExtension;
     mapping(uint256 => string) private _customExtension;
 
-    /// @dev Exclude {} from extension_ and use "" to void
+    /// @dev Exclude {} from json or use "" to void
     constructor(
         string memory name_,
         string memory symbol_,
@@ -66,7 +66,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
                 extension = abi.encodePacked(",", _defaultExtension);
             }
         } else {
-            extension = _extensionPacked(_tokenId);
+            extension = abi.encodePacked(",", _extensionPacked(_tokenId));
         }
         bytes memory data = abi.encodePacked("{", core, extension, "}");
         if (ownerOf(_tokenId) == address(0)) {
@@ -104,7 +104,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         virtual
         returns (bytes memory)
     {
-        return abi.encodePacked(",", _customExtensionMap(_tokenId));
+        return abi.encodePacked(_customExtensionMap(_tokenId));
     }
 
     function _customExtensionMap(uint256 _tokenId)
@@ -116,11 +116,11 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         return _customExtension[_tokenId];
     }
 
-    /// @dev Exclude {} from _json and use "" to void
-    function _setExtension(string memory _json, uint256 _tokenId)
+    /// @dev Exclude {} from json or use "" to void
+    function _setExtension(string memory _extension, uint256 _tokenId)
         internal
         virtual
     {
-        _customExtension[_tokenId] = _json;
+        _customExtension[_tokenId] = _extension;
     }
 }
