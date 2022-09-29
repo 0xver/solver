@@ -13,15 +13,10 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
     string private _defaultExtension;
     mapping(uint256 => string) private _customExtension;
 
-    /// @dev Exclude {} from json or use "" to void
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        string memory extension_
-    ) {
+    constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        _defaultExtension = extension_;
+        _defaultExtension = "";
     }
 
     function name()
@@ -51,7 +46,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         override(IERC721Metadata)
         returns (string memory)
     {
-        bytes memory core = _corePacked(_tokenId);
+        bytes memory core = _coreTokenURI(_tokenId);
         bytes memory extension;
         if (
             keccak256(abi.encodePacked(_customExtension[_tokenId])) ==
@@ -63,10 +58,13 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             ) {
                 delete extension;
             } else {
-                extension = abi.encodePacked(",", _defaultExtensionPacked());
+                extension = abi.encodePacked(",", _defaultExtensionTokenURI());
             }
         } else {
-            extension = abi.encodePacked(",", _customExtensionPacked(_tokenId));
+            extension = abi.encodePacked(
+                ",",
+                _customExtensionTokenURI(_tokenId)
+            );
         }
         bytes memory data = abi.encodePacked("{", core, extension, "}");
         if (ownerOf(_tokenId) == address(0)) {
@@ -82,7 +80,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         }
     }
 
-    function _corePacked(uint256 _tokenId)
+    function _coreTokenURI(uint256 _tokenId)
         internal
         view
         virtual
@@ -98,25 +96,25 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             );
     }
 
-    function _defaultExtensionPacked()
+    function _defaultExtensionTokenURI()
         internal
         view
         virtual
         returns (bytes memory)
     {
-        return abi.encodePacked(_defaultExtensionMap());
+        return abi.encodePacked(_defaultExtensionString());
     }
 
-    function _customExtensionPacked(uint256 _tokenId)
+    function _customExtensionTokenURI(uint256 _tokenId)
         internal
         view
         virtual
         returns (bytes memory)
     {
-        return abi.encodePacked(_customExtensionMap(_tokenId));
+        return abi.encodePacked(_customExtensionString(_tokenId));
     }
 
-    function _defaultExtensionMap()
+    function _defaultExtensionString()
         internal
         view
         virtual
@@ -125,7 +123,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         return _defaultExtension;
     }
 
-    function _customExtensionMap(uint256 _tokenId)
+    function _customExtensionString(uint256 _tokenId)
         internal
         view
         virtual
