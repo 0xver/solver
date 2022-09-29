@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.4;
 
-import "./Math.sol";
+import "./Log.sol";
 
 library Strings {
     bytes16 private constant _SYMBOLS = "0123456789abcdef";
@@ -11,7 +11,7 @@ library Strings {
     function toString(uint256 value) internal pure returns (string memory) {
         unchecked {
             uint256 _ptr;
-            uint256 _length = Math.log10(value) + 1;
+            uint256 _length = Log.log10(value) + 1;
             string memory buffer = new string(_length);
             assembly {
                 _ptr := add(buffer, add(32, _length))
@@ -30,7 +30,7 @@ library Strings {
 
     function toHexString(uint256 value) internal pure returns (string memory) {
         unchecked {
-            return toHexString(value, Math.log256(value) + 1);
+            return toHexString(value, Log.log256(value) + 1);
         }
     }
 

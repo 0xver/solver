@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.4;
 
-library Math {
+library Log {
     function log2(uint256 value) internal pure returns (uint256) {
         uint256 result = 0;
         unchecked {
