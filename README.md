@@ -24,6 +24,7 @@ interface
 ├─ IERC721 — "ERC721 standard"
 library
 ├─ Base64 — "Base64 encoding"
+├─ Log — "Log operations"
 ├─ Merkle — "Merkle proof"
 ├─ Strings — "String from uint"
 supports
@@ -52,6 +53,7 @@ We **do not give any warranties** and **will not be liable for any loss** incurr
 ## Installation
 
 To install with [**Hardhat**](https://github.com/NomicFoundation/hardhat):
+
 ```
 npm install @0xver/solver
 ```
