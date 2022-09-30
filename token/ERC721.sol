@@ -150,13 +150,13 @@ contract ERC721 is IERC721, IERC721Errors {
         if (_to == address(0)) {
             revert TransferTokenToZeroAddress(_from, _to, _tokenId);
         }
+        _transferHook(_from, _to, _tokenId);
         delete _getApproved[_tokenId];
         unchecked {
             _balanceOf[_from] -= 1;
             _balanceOf[_to] += 1;
         }
         _ownerOf[_tokenId] = _to;
-        _transferHook(_from, _to, _tokenId);
         emit Transfer(_from, _to, _tokenId);
     }
 
@@ -190,8 +190,8 @@ contract ERC721 is IERC721, IERC721Errors {
         unchecked {
             for (uint256 i = 0; i < _quantity; i++) {
                 uint256 _tokenId = _currentId + i + 1;
-                _ownerOf[_tokenId] = _to;
                 _mintHook(_tokenId);
+                _ownerOf[_tokenId] = _to;
                 emit Transfer(address(0), _to, _tokenId);
             }
             _balanceOf[_to] += _quantity;
