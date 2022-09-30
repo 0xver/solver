@@ -52,10 +52,16 @@ We **do not give any warranties** and **will not be liable for any loss** incurr
 
 ## Installation
 
-To install with [**Hardhat**](https://github.com/NomicFoundation/hardhat):
+Install Solver:
 
 ```
-npm install @0xver/solver
+npm install --save-dev @0xver/solver
+```
+
+Install [**Hardhat**](https://github.com/NomicFoundation/hardhat):
+
+```
+npm install --save-dev hardhat
 ```
 
 ## Acknowledgements
