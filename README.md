@@ -52,7 +52,7 @@ We **do not give any warranties** and **will not be liable for any loss** incurr
 
 ## Installation
 
-Install Solver:
+Install **Solver**:
 
 ```
 npm install --save-dev @0xver/solver
