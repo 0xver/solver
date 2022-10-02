@@ -173,20 +173,20 @@ contract ERC721 is IERC721, IERC721Errors {
     }
 
     function _safeMint(address _to, bytes memory _data) internal virtual {
-        _unsafeMint(_to, 1);
+        _mint(_to, 1);
         if (!_onERC721Received(address(0), _to, _currentId, _data)) {
             revert TransferToNonERC721Receiver(_to);
         }
     }
 
-    function _mint(address _to, uint256 _quantity) internal virtual {
+    function _eoaMint(address _to, uint256 _quantity) internal virtual {
         if (tx.origin != msg.sender) {
             revert TxOriginNonSender(tx.origin, msg.sender);
         }
-        _unsafeMint(_to, _quantity);
+        _mint(_to, _quantity);
     }
 
-    function _unsafeMint(address _to, uint256 _quantity) internal virtual {
+    function _mint(address _to, uint256 _quantity) internal virtual {
         unchecked {
             for (uint256 i = 0; i < _quantity; i++) {
                 uint256 _tokenId = _currentId + i + 1;
