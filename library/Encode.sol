@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.4;
 
-library Base64 {
+library Encode {
     string internal constant _TABLE =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-    function encode(bytes memory data) internal pure returns (string memory) {
+    function toBase64(bytes memory data) internal pure returns (string memory) {
         if (data.length == 0) return "";
         string memory table = _TABLE;
         string memory result = new string(4 * ((data.length + 2) / 3));
@@ -49,5 +49,9 @@ library Base64 {
             }
         }
         return result;
+    }
+
+    function toBytes32(string memory _string) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_string));
     }
 }
