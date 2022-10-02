@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 import "../ERC721.sol";
 import "../../interface/metadata/IERC721Metadata.sol";
 import "../../library/Strings.sol";
-import "../../library/Base64.sol";
+import "../../library/Encode.sol";
 
 contract ERC721Metadata is ERC721, IERC721Metadata {
     string private _name;
@@ -49,16 +49,13 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         bytes memory core = _coreTokenURI(_tokenId);
         bytes memory extension;
         if (
-            keccak256(abi.encodePacked(_customExtension[_tokenId])) ==
-            keccak256(abi.encodePacked(""))
+            Encode.toBytes32(_customExtension[_tokenId]) == Encode.toBytes32("")
         ) {
-            if (
-                keccak256(abi.encodePacked(_defaultExtension)) ==
-                keccak256(abi.encodePacked(""))
-            ) {
+            if (Encode.toBytes32(_defaultExtension) == Encode.toBytes32("")) {
                 delete extension;
             } else {
-                extension = abi.encodePacked(",", _defaultExtensionTokenURI());
+                delete extension;
+                core = _defaultExtensionTokenURI(_tokenId);
             }
         } else {
             extension = abi.encodePacked(
@@ -74,7 +71,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
                 string(
                     abi.encodePacked(
                         "data:application/json;base64,",
-                        Base64.encode(data)
+                        Encode.toBase64(data)
                     )
                 );
         }
@@ -96,13 +93,18 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
             );
     }
 
-    function _defaultExtensionTokenURI()
+    function _defaultExtensionTokenURI(uint256 _tokenId)
         internal
         view
         virtual
         returns (bytes memory)
     {
-        return abi.encodePacked(_defaultExtensionString());
+        return
+            abi.encodePacked(
+                _coreTokenURI(_tokenId),
+                ",",
+                _defaultExtensionString()
+            );
     }
 
     function _customExtensionTokenURI(uint256 _tokenId)
