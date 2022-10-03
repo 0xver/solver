@@ -110,7 +110,7 @@ contract ERC721 is IERC721, IERC721Errors {
     }
 
     function totalSupply() public view virtual returns (uint256) {
-        return (_currentId - _subtractId);
+        return _currentId - _subtractId;
     }
 
     function _mintHook(uint256 _tokenId) internal virtual {}
@@ -123,15 +123,16 @@ contract ERC721 is IERC721, IERC721Errors {
         uint256 _tokenId
     ) internal virtual {}
 
-    function _isApprovedOrOwner(address _caller, uint256 _tokenId)
+    function _isApprovedOrOwner(address _address, uint256 _tokenId)
         internal
         view
         virtual
         returns (bool)
     {
-        return (_ownerOf[_tokenId] == _caller ||
-            _isApprovedForAll[_ownerOf[_tokenId]][_caller] ||
-            _getApproved[_tokenId] == _caller);
+        return
+            _ownerOf[_tokenId] == _address ||
+            _isApprovedForAll[_ownerOf[_tokenId]][_address] ||
+            _getApproved[_tokenId] == _address;
     }
 
     function _transfer(
