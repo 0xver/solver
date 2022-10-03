@@ -1,15 +1,8 @@
 {
   "name": "@0xver/solver",
   "license": "AGPL-3.0-only",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Basic building blocks for smart contract development",
-  "files": [
-    "auth/**/*.sol",
-    "interface/**/*.sol",
-    "library/**/*.sol",
-    "supports/**/*.sol",
-    "token/**/*.sol"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/0xver/solver.git"
