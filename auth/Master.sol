@@ -7,6 +7,7 @@ import "../interface/errors/IERC173Errors.sol";
 
 contract Master is IERC173, IERC173Errors {
     address private _master;
+    address private _getApprovedOwnership;
 
     constructor(address master_) {
         _transferOwnership(master_);
@@ -33,6 +34,23 @@ contract Master is IERC173, IERC173Errors {
             revert TransferMasterToZeroAddress(owner(), _newMaster);
         }
         _transferOwnership(_newMaster);
+    }
+
+    function approveOwnership(address _approved) public virtual master {
+        _getApprovedOwnership = _approved;
+    }
+
+    function getApprovedOwner() public view virtual returns (address) {
+        return _getApprovedOwnership;
+    }
+
+    function isApprovedOwnerOrOwner(address _address)
+        public
+        view
+        virtual
+        returns (bool)
+    {
+        return _getApprovedOwnership == _address || _master == _address;
     }
 
     function _transferOwnership(address _newMaster) internal virtual {
