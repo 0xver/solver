@@ -4,7 +4,7 @@
 
 Basic building blocks for smart contract development
 
-## Solidity Directory
+## Module Directory
 
 ```ml
 auth
