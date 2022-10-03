@@ -3,10 +3,10 @@
 pragma solidity ^0.8.4;
 
 import "../interface/IERC165.sol";
-import "../auth/Master.sol";
+import "../auth/Owner.sol";
 import "../token/metadata/ERC721Metadata.sol";
 
-abstract contract ERC721Supports is IERC165, Master, ERC721Metadata {
+abstract contract ERC721Supports is IERC165, Owner, ERC721Metadata {
     function supportsInterface(bytes4 interfaceId)
         public
         pure
