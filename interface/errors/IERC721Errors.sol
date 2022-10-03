@@ -6,11 +6,11 @@ interface IERC721Errors {
     error NonApprovedNonOwner(
         bool _isApprovedForAll,
         address _getApproved,
-        address _owner,
+        address _ownerOf,
         address _sender
     );
 
-    error NonOwnerApproval(address _owner, address _sender);
+    error NonOwnerApproval(address _ownerOf, address _sender);
 
     error TransferTokenToZeroAddress(
         address _from,
