@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 
 import "../ERC721.sol";
 import "../../interface/metadata/IERC721Metadata.sol";
-import "../../library/Strings.sol";
 import "../../library/Encode.sol";
 
 contract ERC721Metadata is ERC721, IERC721Metadata {
@@ -88,7 +87,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
                 '"name":"',
                 name(),
                 " #",
-                Strings.toString(_tokenId),
+                Encode.toString(_tokenId),
                 '"'
             );
     }
@@ -134,12 +133,10 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
         return _customExtension[_tokenId];
     }
 
-    /// @dev Exclude {} from json or use "" to void
     function _setDefaultExtension(string memory _extension) internal virtual {
         _defaultExtension = _extension;
     }
 
-    /// @dev Exclude {} from json or use "" to void
     function _setCustomExtension(string memory _extension, uint256 _tokenId)
         internal
         virtual
