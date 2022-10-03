@@ -3,12 +3,9 @@
 pragma solidity ^0.8.4;
 
 interface IERC173 {
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferred(address indexed _from, address indexed _to);
 
     function owner() external view returns (address);
 
-    function transferOwnership(address _newOwner) external;
+    function transferOwnership(address _to) external;
 }

@@ -7,10 +7,10 @@ import "../interface/errors/IERC173Errors.sol";
 
 contract Master is IERC173, IERC173Errors {
     address private _master;
-    address private _getApprovedOwnership;
+    address private _getApprovedMaster;
 
     constructor(address master_) {
-        _transferOwnership(master_);
+        _transferMaster(master_);
     }
 
     modifier master() {
@@ -24,38 +24,38 @@ contract Master is IERC173, IERC173Errors {
         return _master;
     }
 
-    function transferOwnership(address _newMaster)
+    function transferOwnership(address _to)
         public
         virtual
         override(IERC173)
         master
     {
-        if (_newMaster == address(0)) {
-            revert TransferMasterToZeroAddress(owner(), _newMaster);
+        if (_to == address(0)) {
+            revert TransferMasterToZeroAddress(owner(), _to);
         }
-        _transferOwnership(_newMaster);
+        _transferMaster(_to);
     }
 
-    function approveOwnership(address _approved) public virtual master {
-        _getApprovedOwnership = _approved;
+    function approveMaster(address _approved) public virtual master {
+        _getApprovedMaster = _approved;
     }
 
-    function getApprovedOwner() public view virtual returns (address) {
-        return _getApprovedOwnership;
+    function getApprovedMaster() public view virtual returns (address) {
+        return _getApprovedMaster;
     }
 
-    function isApprovedOwnerOrOwner(address _address)
-        public
+    function _isApprovedMasterOrMaster(address _address)
+        internal
         view
         virtual
         returns (bool)
     {
-        return _getApprovedOwnership == _address || _master == _address;
+        return _getApprovedMaster == _address || _master == _address;
     }
 
-    function _transferOwnership(address _newMaster) internal virtual {
-        address previousMaster = _master;
-        _master = _newMaster;
-        emit OwnershipTransferred(previousMaster, _newMaster);
+    function _transferMaster(address _to) internal virtual {
+        address _from = _master;
+        _master = _to;
+        emit OwnershipTransferred(_from, _to);
     }
 }
