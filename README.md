@@ -8,7 +8,7 @@ Basic building blocks for smart contract development
 
 ```ml
 auth
-├─ Master — "Implementation of the ERC173 standard"
+├─ Owner — "Implementation of the ERC173 standard"
 interface
 │  ├─ errors
 │  │  ├─ IERC173Errors — "ERC173 errors interface"
