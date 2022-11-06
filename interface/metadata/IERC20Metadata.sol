@@ -3,7 +3,7 @@
 pragma solidity ^0.8.4;
 
 interface IERC20Metadata {
-    function name() external view returns (string memory);
+	function name() external view returns (string memory);
 
-    function symbol() external view returns (string memory);
+	function symbol() external view returns (string memory);
 }
