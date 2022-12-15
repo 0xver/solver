@@ -7,7 +7,7 @@ import "../interface/errors/IERC173Errors.sol";
 
 contract Owner is IERC173, IERC173Errors {
 	address private _owner;
-	address private _getApprovedOwner;
+	address private _operator;
 
 	constructor(address owner_) {
 		_transferOwnership(owner_);
@@ -20,8 +20,11 @@ contract Owner is IERC173, IERC173Errors {
 		_;
 	}
 
-	function owner() public view virtual override(IERC173) returns (address) {
-		return _owner;
+	modifier operatorship() {
+		if (owner() != msg.sender || operator() != msg.sender) {
+			revert NonOperator(operator(), msg.sender);
+		}
+		_;
 	}
 
 	function transferOwnership(address _to)
@@ -36,26 +39,22 @@ contract Owner is IERC173, IERC173Errors {
 		_transferOwnership(_to);
 	}
 
-	function approveOwnership(address _approved) public virtual ownership {
-		_getApprovedOwner = _approved;
+	function setOperator(address _newOperator) public virtual ownership {
+		_operator = _newOperator;
 	}
 
-	function getApprovedOwner() public view virtual returns (address) {
-		return _getApprovedOwner;
+	function owner() public view virtual override(IERC173) returns (address) {
+		return _owner;
 	}
 
-	function _isApprovedOwnerOrOwnership(address _address)
-		internal
-		view
-		virtual
-		returns (bool)
-	{
-		return _getApprovedOwner == _address || _owner == _address;
+	function operator() public view virtual returns (address) {
+		return _operator;
 	}
 
 	function _transferOwnership(address _to) internal virtual {
 		address _from = _owner;
 		_owner = _to;
+		delete _operator;
 		emit OwnershipTransferred(_from, _to);
 	}
 }
