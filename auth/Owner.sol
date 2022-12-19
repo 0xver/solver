@@ -21,18 +21,15 @@ contract Owner is IERC173, IERC173Errors {
 	}
 
 	modifier operatorship() {
-		if (owner() != msg.sender || operator() != msg.sender) {
+		if (operator() != msg.sender) {
 			revert NonOperator(operator(), msg.sender);
 		}
 		_;
 	}
 
-	function transferOwnership(address _to)
-		public
-		virtual
-		override(IERC173)
-		ownership
-	{
+	function transferOwnership(
+		address _to
+	) public virtual override(IERC173) ownership {
 		if (_to == address(0)) {
 			revert TransferOwnershipToZeroAddress(owner(), _to);
 		}
