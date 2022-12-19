@@ -14,23 +14,15 @@ contract ERC721 is IERC721, IERC721Errors {
 	mapping(uint256 => address) private _getApproved;
 	mapping(address => mapping(address => bool)) private _isApprovedForAll;
 
-	function balanceOf(address _owner)
-		public
-		view
-		virtual
-		override(IERC721)
-		returns (uint256)
-	{
+	function balanceOf(
+		address _owner
+	) public view virtual override(IERC721) returns (uint256) {
 		return _balanceOf[_owner];
 	}
 
-	function ownerOf(uint256 _tokenId)
-		public
-		view
-		virtual
-		override(IERC721)
-		returns (address)
-	{
+	function ownerOf(
+		uint256 _tokenId
+	) public view virtual override(IERC721) returns (address) {
 		return _ownerOf[_tokenId];
 	}
 
@@ -68,11 +60,10 @@ contract ERC721 is IERC721, IERC721Errors {
 		_transfer(_from, _to, _tokenId);
 	}
 
-	function approve(address _approved, uint256 _tokenId)
-		public
-		virtual
-		override(IERC721)
-	{
+	function approve(
+		address _approved,
+		uint256 _tokenId
+	) public virtual override(IERC721) {
 		if (_ownerOf[_tokenId] != msg.sender) {
 			revert NonOwnerApproval(_ownerOf[_tokenId], msg.sender);
 		}
@@ -80,32 +71,24 @@ contract ERC721 is IERC721, IERC721Errors {
 		emit Approval(msg.sender, _approved, _tokenId);
 	}
 
-	function setApprovalForAll(address _operator, bool _approved)
-		public
-		virtual
-		override(IERC721)
-	{
+	function setApprovalForAll(
+		address _operator,
+		bool _approved
+	) public virtual override(IERC721) {
 		_isApprovedForAll[msg.sender][_operator] = _approved;
 		emit ApprovalForAll(msg.sender, _operator, _approved);
 	}
 
-	function getApproved(uint256 _tokenId)
-		public
-		view
-		virtual
-		override(IERC721)
-		returns (address)
-	{
+	function getApproved(
+		uint256 _tokenId
+	) public view virtual override(IERC721) returns (address) {
 		return _getApproved[_tokenId];
 	}
 
-	function isApprovedForAll(address _owner, address _operator)
-		public
-		view
-		virtual
-		override(IERC721)
-		returns (bool)
-	{
+	function isApprovedForAll(
+		address _owner,
+		address _operator
+	) public view virtual override(IERC721) returns (bool) {
 		return _isApprovedForAll[_owner][_operator];
 	}
 
@@ -123,12 +106,10 @@ contract ERC721 is IERC721, IERC721Errors {
 		uint256 _tokenId
 	) internal virtual {}
 
-	function _isApprovedOrOwner(address _address, uint256 _tokenId)
-		internal
-		view
-		virtual
-		returns (bool)
-	{
+	function _isApprovedOrOwner(
+		address _address,
+		uint256 _tokenId
+	) internal view virtual returns (bool) {
 		return
 			_ownerOf[_tokenId] == _address ||
 			_isApprovedForAll[_ownerOf[_tokenId]][_address] ||

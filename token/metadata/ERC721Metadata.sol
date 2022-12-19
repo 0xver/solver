@@ -38,13 +38,9 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 		return _symbol;
 	}
 
-	function tokenURI(uint256 _tokenId)
-		public
-		view
-		virtual
-		override(IERC721Metadata)
-		returns (string memory)
-	{
+	function tokenURI(
+		uint256 _tokenId
+	) public view virtual override(IERC721Metadata) returns (string memory) {
 		bytes memory core = _coreTokenURI(_tokenId);
 		bytes memory extension;
 		if (
@@ -76,12 +72,9 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 		}
 	}
 
-	function _coreTokenURI(uint256 _tokenId)
-		internal
-		view
-		virtual
-		returns (bytes memory)
-	{
+	function _coreTokenURI(
+		uint256 _tokenId
+	) internal view virtual returns (bytes memory) {
 		return
 			abi.encodePacked(
 				'"name":"',
@@ -92,12 +85,9 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 			);
 	}
 
-	function _defaultExtensionTokenURI(uint256 _tokenId)
-		internal
-		view
-		virtual
-		returns (bytes memory)
-	{
+	function _defaultExtensionTokenURI(
+		uint256 _tokenId
+	) internal view virtual returns (bytes memory) {
 		return
 			abi.encodePacked(
 				_coreTokenURI(_tokenId),
@@ -106,12 +96,9 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 			);
 	}
 
-	function _customExtensionTokenURI(uint256 _tokenId)
-		internal
-		view
-		virtual
-		returns (bytes memory)
-	{
+	function _customExtensionTokenURI(
+		uint256 _tokenId
+	) internal view virtual returns (bytes memory) {
 		return abi.encodePacked(_customExtensionString(_tokenId));
 	}
 
@@ -124,12 +111,9 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 		return _defaultExtension;
 	}
 
-	function _customExtensionString(uint256 _tokenId)
-		internal
-		view
-		virtual
-		returns (string memory)
-	{
+	function _customExtensionString(
+		uint256 _tokenId
+	) internal view virtual returns (string memory) {
 		return _customExtension[_tokenId];
 	}
 
@@ -137,10 +121,10 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 		_defaultExtension = _extension;
 	}
 
-	function _setCustomExtension(string memory _extension, uint256 _tokenId)
-		internal
-		virtual
-	{
+	function _setCustomExtension(
+		string memory _extension,
+		uint256 _tokenId
+	) internal virtual {
 		_customExtension[_tokenId] = _extension;
 	}
 }

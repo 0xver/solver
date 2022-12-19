@@ -50,8 +50,8 @@ interface IERC721 {
 
 	function getApproved(uint256 _tokenId) external view returns (address);
 
-	function isApprovedForAll(address _owner, address _operator)
-		external
-		view
-		returns (bool);
+	function isApprovedForAll(
+		address _owner,
+		address _operator
+	) external view returns (bool);
 }

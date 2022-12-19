@@ -10,11 +10,9 @@ library Encode {
 	bytes16 private constant _SYMBOLS = "0123456789abcdef";
 	uint8 private constant _ADDRESS_LENGTH = 20;
 
-	function toBase64(bytes memory _data)
-		internal
-		pure
-		returns (string memory)
-	{
+	function toBase64(
+		bytes memory _data
+	) internal pure returns (string memory) {
 		if (_data.length == 0) return "";
 		string memory table = _TABLE;
 		string memory result = new string(4 * ((_data.length + 2) / 3));
@@ -93,11 +91,10 @@ library Encode {
 		return toHexString(uint256(uint160(_addr)), _ADDRESS_LENGTH);
 	}
 
-	function toHexString(uint256 _value, uint256 _length)
-		internal
-		pure
-		returns (string memory)
-	{
+	function toHexString(
+		uint256 _value,
+		uint256 _length
+	) internal pure returns (string memory) {
 		bytes memory buffer = new bytes(2 * _length + 2);
 		buffer[0] = "0";
 		buffer[1] = "x";

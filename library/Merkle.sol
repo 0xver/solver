@@ -11,11 +11,10 @@ library Merkle {
 		return processProof(_proof, _leaf) == _root;
 	}
 
-	function processProof(bytes32[] memory _proof, bytes32 _leaf)
-		internal
-		pure
-		returns (bytes32)
-	{
+	function processProof(
+		bytes32[] memory _proof,
+		bytes32 _leaf
+	) internal pure returns (bytes32) {
 		bytes32 computedHash = _leaf;
 		for (uint256 i = 0; i < _proof.length; i++) {
 			bytes32 proofElement = _proof[i];
@@ -28,11 +27,10 @@ library Merkle {
 		return computedHash;
 	}
 
-	function _efficientHash(bytes32 _a, bytes32 _b)
-		private
-		pure
-		returns (bytes32 value)
-	{
+	function _efficientHash(
+		bytes32 _a,
+		bytes32 _b
+	) private pure returns (bytes32 value) {
 		assembly {
 			mstore(0x00, _a)
 			mstore(0x20, _b)

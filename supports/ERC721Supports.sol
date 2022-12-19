@@ -7,13 +7,9 @@ import "../auth/Owner.sol";
 import "../token/metadata/ERC721Metadata.sol";
 
 abstract contract ERC721Supports is IERC165, Owner, ERC721Metadata {
-	function supportsInterface(bytes4 interfaceId)
-		public
-		pure
-		virtual
-		override(IERC165)
-		returns (bool)
-	{
+	function supportsInterface(
+		bytes4 interfaceId
+	) public pure virtual override(IERC165) returns (bool) {
 		return
 			interfaceId == type(IERC165).interfaceId ||
 			interfaceId == type(IERC173).interfaceId ||

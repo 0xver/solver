@@ -44,31 +44,31 @@ library Log {
 	function log10(uint256 _value) internal pure returns (uint256) {
 		uint256 result = 0;
 		unchecked {
-			if (_value >= 10**64) {
-				_value /= 10**64;
+			if (_value >= 10 ** 64) {
+				_value /= 10 ** 64;
 				result += 64;
 			}
-			if (_value >= 10**32) {
-				_value /= 10**32;
+			if (_value >= 10 ** 32) {
+				_value /= 10 ** 32;
 				result += 32;
 			}
-			if (_value >= 10**16) {
-				_value /= 10**16;
+			if (_value >= 10 ** 16) {
+				_value /= 10 ** 16;
 				result += 16;
 			}
-			if (_value >= 10**8) {
-				_value /= 10**8;
+			if (_value >= 10 ** 8) {
+				_value /= 10 ** 8;
 				result += 8;
 			}
-			if (_value >= 10**4) {
-				_value /= 10**4;
+			if (_value >= 10 ** 4) {
+				_value /= 10 ** 4;
 				result += 4;
 			}
-			if (_value >= 10**2) {
-				_value /= 10**2;
+			if (_value >= 10 ** 2) {
+				_value /= 10 ** 2;
 				result += 2;
 			}
-			if (_value >= 10**1) {
+			if (_value >= 10 ** 1) {
 				result += 1;
 			}
 		}

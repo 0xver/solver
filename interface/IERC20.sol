@@ -27,8 +27,8 @@ interface IERC20 {
 
 	function approve(address _spender, uint256 _value) external returns (bool);
 
-	function allowance(address _owner, address _spender)
-		external
-		view
-		returns (uint256);
+	function allowance(
+		address _owner,
+		address _spender
+	) external view returns (uint256);
 }

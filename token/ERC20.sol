@@ -23,22 +23,16 @@ contract ERC20 is IERC20 {
 		return _totalSupply;
 	}
 
-	function balanceOf(address _owner)
-		public
-		view
-		virtual
-		override(IERC20)
-		returns (uint256)
-	{
+	function balanceOf(
+		address _owner
+	) public view virtual override(IERC20) returns (uint256) {
 		return _balanceOf[_owner];
 	}
 
-	function transfer(address _to, uint256 _value)
-		public
-		virtual
-		override(IERC20)
-		returns (bool)
-	{
+	function transfer(
+		address _to,
+		uint256 _value
+	) public virtual override(IERC20) returns (bool) {
 		require(balanceOf(msg.sender) >= _value, "EXCEEDS_BALANCE");
 		_transfer(msg.sender, _to, _value);
 		return true;
@@ -61,12 +55,10 @@ contract ERC20 is IERC20 {
 		return true;
 	}
 
-	function approve(address _spender, uint256 _value)
-		public
-		virtual
-		override(IERC20)
-		returns (bool)
-	{
+	function approve(
+		address _spender,
+		uint256 _value
+	) public virtual override(IERC20) returns (bool) {
 		require(_spender != address(0), "APPROVE_ZERO_ADDRESS");
 		require(_spender != msg.sender, "APPROVE_OWNER");
 		_allowance[msg.sender][_spender] = _value;
@@ -74,13 +66,10 @@ contract ERC20 is IERC20 {
 		return true;
 	}
 
-	function allowance(address _owner, address _spender)
-		public
-		view
-		virtual
-		override(IERC20)
-		returns (uint256)
-	{
+	function allowance(
+		address _owner,
+		address _spender
+	) public view virtual override(IERC20) returns (uint256) {
 		return _allowance[_owner][_spender];
 	}
 
