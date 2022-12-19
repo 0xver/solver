@@ -21,10 +21,11 @@ contract Owner is IERC173, IERC173Errors {
 	}
 
 	modifier operatorship() {
-		if (operator() != msg.sender) {
+		if (owner() == msg.sender || operator() == msg.sender) {
+			_;
+		} else {
 			revert NonOperator(operator(), msg.sender);
 		}
-		_;
 	}
 
 	function transferOwnership(
