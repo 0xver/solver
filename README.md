@@ -23,7 +23,7 @@ interface
 ├─ IERC173 — "ERC173 standard"
 ├─ IERC721 — "ERC721 standard"
 library
-├─ Encode — "Encoding"
+├─ Encode — "Encoding operations"
 ├─ Log — "Log operations"
 ├─ Merkle — "Merkle proof"
 supports
