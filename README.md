@@ -23,10 +23,9 @@ interface
 ├─ IERC173 — "ERC173 standard"
 ├─ IERC721 — "ERC721 standard"
 library
-├─ Base64 — "Base64 encoding"
+├─ Encode — "Encoding"
 ├─ Log — "Log operations"
 ├─ Merkle — "Merkle proof"
-├─ Strings — "String from uint"
 supports
 ├─ ERC20Supports — "ERC20 supports interface and bundling"
 ├─ ERC721Supports — "ERC721 supports interface and bundling"
