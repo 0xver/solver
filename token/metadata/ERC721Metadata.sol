@@ -9,13 +9,11 @@ import "../../library/Encode.sol";
 contract ERC721Metadata is ERC721, IERC721Metadata {
 	string private _name;
 	string private _symbol;
-	string private _defaultExtension;
-	mapping(uint256 => string) private _customExtension;
+	mapping(uint256 => string) private _custom;
 
 	constructor(string memory name_, string memory symbol_) {
 		_name = name_;
 		_symbol = symbol_;
-		_defaultExtension = "";
 	}
 
 	function name()
@@ -41,24 +39,28 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 	function tokenURI(
 		uint256 _tokenId
 	) public view virtual override(IERC721Metadata) returns (string memory) {
-		bytes memory core = _coreTokenURI(_tokenId);
-		bytes memory extension;
-		if (
-			Encode.toBytes32(_customExtension[_tokenId]) == Encode.toBytes32("")
-		) {
-			if (Encode.toBytes32(_defaultExtension) == Encode.toBytes32("")) {
-				delete extension;
+		bytes memory data;
+		if (_customTokenURI(_tokenId).length == 0) {
+			if (_extendedTokenURI(_tokenId).length == 0) {
+				data = abi.encodePacked("{", _baseTokenURI(_tokenId), "}");
 			} else {
-				delete extension;
-				core = _defaultExtensionTokenURI(_tokenId);
+				data = abi.encodePacked(
+					"{",
+					_baseTokenURI(_tokenId),
+					",",
+					_extendedTokenURI(_tokenId),
+					"}"
+				);
 			}
 		} else {
-			extension = abi.encodePacked(
+			data = abi.encodePacked(
+				"{",
+				_baseTokenURI(_tokenId),
 				",",
-				_customExtensionTokenURI(_tokenId)
+				_customTokenURI(_tokenId),
+				"}"
 			);
 		}
-		bytes memory data = abi.encodePacked("{", core, extension, "}");
 		if (ownerOf(_tokenId) == address(0)) {
 			return "INVALID_ID";
 		} else {
@@ -72,7 +74,7 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 		}
 	}
 
-	function _coreTokenURI(
+	function _baseTokenURI(
 		uint256 _tokenId
 	) internal view virtual returns (bytes memory) {
 		return
@@ -85,46 +87,20 @@ contract ERC721Metadata is ERC721, IERC721Metadata {
 			);
 	}
 
-	function _defaultExtensionTokenURI(
+	function _extendedTokenURI(
+		uint256 _tokenId
+	) internal view virtual returns (bytes memory) {}
+
+	function _customTokenURI(
 		uint256 _tokenId
 	) internal view virtual returns (bytes memory) {
-		return
-			abi.encodePacked(
-				_coreTokenURI(_tokenId),
-				",",
-				_defaultExtensionString()
-			);
+		return abi.encodePacked(_custom[_tokenId]);
 	}
 
-	function _customExtensionTokenURI(
-		uint256 _tokenId
-	) internal view virtual returns (bytes memory) {
-		return abi.encodePacked(_customExtensionString(_tokenId));
-	}
-
-	function _defaultExtensionString()
-		internal
-		view
-		virtual
-		returns (string memory)
-	{
-		return _defaultExtension;
-	}
-
-	function _customExtensionString(
-		uint256 _tokenId
-	) internal view virtual returns (string memory) {
-		return _customExtension[_tokenId];
-	}
-
-	function _setDefaultExtension(string memory _extension) internal virtual {
-		_defaultExtension = _extension;
-	}
-
-	function _setCustomExtension(
-		string memory _extension,
-		uint256 _tokenId
+	function _setCustomTokenURI(
+		uint256 _tokenId,
+		string memory _json
 	) internal virtual {
-		_customExtension[_tokenId] = _extension;
+		_custom[_tokenId] = _json;
 	}
 }
