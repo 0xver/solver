@@ -141,13 +141,16 @@ contract ERC721 is IERC721, IERC721Errors {
 		if (_to == address(0)) {
 			revert TransferToZeroAddress(_from, _to, _tokenId);
 		}
+		_transferHook(_from, _to, _tokenId);
+		if (_from != _ownerOf[_tokenId]) {
+			revert FromAddressNonOwner(_from, _ownerOf[_tokenId]);
+		}
 		delete _getApproved[_tokenId];
 		unchecked {
 			_balanceOf[_from] -= 1;
 			_balanceOf[_to] += 1;
 		}
 		_ownerOf[_tokenId] = _to;
-		_transferHook(_from, _to, _tokenId);
 		emit Transfer(_from, _to, _tokenId);
 	}
 
@@ -170,21 +173,20 @@ contract ERC721 is IERC721, IERC721Errors {
 		}
 	}
 
-	function _eoaMint(address _to, uint256 _quantity) internal virtual {
-		if (tx.origin != msg.sender) {
-			revert TxOriginNonSender(tx.origin, msg.sender);
-		}
-		_mint(_to, _quantity);
-	}
-
 	function _mint(address _to, uint256 _quantity) internal virtual {
-		unchecked {
-			for (uint256 i = 0; i < _quantity; i++) {
-				uint256 _tokenId = _currentId + i + 1;
-				_mintHook(_tokenId);
-				_ownerOf[_tokenId] = _to;
-				emit Transfer(address(0), _to, _tokenId);
+		for (uint256 i = 0; i < _quantity; ) {
+			uint256 _tokenId;
+			unchecked {
+				_tokenId = _currentId + i + 1;
 			}
+			_mintHook(_tokenId);
+			_ownerOf[_tokenId] = _to;
+			emit Transfer(address(0), _to, _tokenId);
+			unchecked {
+				i += 1;
+			}
+		}
+		unchecked {
 			_balanceOf[_to] += _quantity;
 			_currentId += _quantity;
 		}
@@ -202,6 +204,12 @@ contract ERC721 is IERC721, IERC721Errors {
 		}
 		_burnHook(_tokenId);
 		emit Transfer(_from, address(0), _tokenId);
+	}
+
+	function _eoaOnly() internal virtual {
+		if (tx.origin != msg.sender) {
+			revert TxOriginNonSender(tx.origin, msg.sender);
+		}
 	}
 
 	function _onERC721Received(

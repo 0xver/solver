@@ -103,4 +103,8 @@ contract ERC20 is IERC20 {
 		}
 		emit Transfer(_from, address(0), _value);
 	}
+
+	function _eoaOnly() internal virtual {
+		require(tx.origin == msg.sender, "TX_ORIGIN_NON_SENDER");
+	}
 }
