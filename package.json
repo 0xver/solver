@@ -1,7 +1,7 @@
 {
 	"name": "@0xver/solver",
 	"license": "AGPL-3.0-only",
-	"version": "10.0.0",
+	"version": "10.1.0",
 	"description": "Basic building blocks for smart contract development",
 	"repository": {
 		"type": "git",
