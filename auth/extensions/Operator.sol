@@ -23,10 +23,10 @@ contract Operator is IERC173, IOperator, IERC173Errors, IOperatorErrors {
 	}
 
 	modifier operatorship() {
-		if (owner() == msg.sender || operator() == msg.sender) {
+		if (operator() == msg.sender || owner() == msg.sender) {
 			_;
 		} else {
-			revert NonOperator(operator(), msg.sender);
+			revert NonOperatorshipNonOwnership(operator(), owner(), msg.sender);
 		}
 	}
 

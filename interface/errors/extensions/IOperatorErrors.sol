@@ -3,5 +3,9 @@
 pragma solidity ^0.8.4;
 
 interface IOperatorErrors {
-	error NonOperator(address _operator, address _sender);
+	error NonOperatorshipNonOwnership(
+		address _operator,
+		address _owner,
+		address _sender
+	);
 }
