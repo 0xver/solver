@@ -70,13 +70,14 @@ contract NFT is ERC165, Operator, ERC721Metadata {
 	{}
 
 	function mint(uint256 _quantity) public {
+		_eoaOnly();
 		if (
 			_quantity + totalSupply() > totalSupplyLimit ||
 			_quantity > userTxnLimit
 		) {
 			revert QuantityLimit(_quantity, userTxnLimit, totalSupplyLimit);
 		}
-		_eoaMint(msg.sender, _quantity);
+		_mint(msg.sender, _quantity);
 	}
 
 	function airdrop(address _to, uint256 _quantity) public operatorship {
@@ -100,7 +101,6 @@ contract NFT is ERC165, Operator, ERC721Metadata {
 			super.supportsInterface(interfaceId);
 	}
 }
-
 ```
 
 ## Safety
