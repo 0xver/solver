@@ -117,7 +117,7 @@ function mint() public {
 }
 ```
 
-Stable versions of this software begin at version 10.0.0. **Only use version 10.0.0 or later for production**. **ALWAYS** review contracts before using as they are not audited.
+Major improvements for this software begin at version 10.0.0. **Only use version 10.0.0 or later** for production. **ALWAYS** review contracts before using as they are not audited.
 
 This is **experimental software** and is provided on an "as is" and "as available" basis.
 
