@@ -110,16 +110,6 @@ contract ERC721 is IERC721, IERC721Errors {
 		return _currentId - _subtractId;
 	}
 
-	function _mintHook(uint256 _tokenId) internal virtual {}
-
-	function _burnHook(uint256 _tokenId) internal virtual {}
-
-	function _transferHook(
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) internal virtual {}
-
 	function _isApprovedOrOwner(
 		address _address,
 		uint256 _tokenId
@@ -141,7 +131,7 @@ contract ERC721 is IERC721, IERC721Errors {
 		if (_to == address(0)) {
 			revert TransferToZeroAddress(_from, _to, _tokenId);
 		}
-		_transferHook(_from, _to, _tokenId);
+		_beforeTransferHook(_from, _to, _tokenId);
 		if (_from != _ownerOf[_tokenId]) {
 			revert FromAddressNonOwner(_from, _ownerOf[_tokenId]);
 		}
@@ -152,14 +142,7 @@ contract ERC721 is IERC721, IERC721Errors {
 		}
 		_ownerOf[_tokenId] = _to;
 		emit Transfer(_from, _to, _tokenId);
-	}
-
-	function _totalMinted() internal view virtual returns (uint256) {
-		return _currentId;
-	}
-
-	function _totalBurned() internal view virtual returns (uint256) {
-		return _subtractId;
+		_afterTransferHook(_from, _to, _tokenId);
 	}
 
 	function _safeMint(address _to) internal virtual {
@@ -202,8 +185,15 @@ contract ERC721 is IERC721, IERC721Errors {
 			_balanceOf[_from] -= 1;
 			_subtractId += 1;
 		}
-		_burnHook(_tokenId);
 		emit Transfer(_from, address(0), _tokenId);
+	}
+
+	function _totalMinted() internal view virtual returns (uint256) {
+		return _currentId;
+	}
+
+	function _totalBurned() internal view virtual returns (uint256) {
+		return _subtractId;
 	}
 
 	function _eoaOnly() internal virtual {
@@ -211,6 +201,20 @@ contract ERC721 is IERC721, IERC721Errors {
 			revert TxOriginNonSender(tx.origin, msg.sender);
 		}
 	}
+
+	function _beforeTransferHook(
+		address _from,
+		address _to,
+		uint256 _tokenId
+	) internal virtual {}
+
+	function _afterTransferHook(
+		address _from,
+		address _to,
+		uint256 _tokenId
+	) internal virtual {}
+
+	function _mintHook(uint256 _tokenId) internal virtual {}
 
 	function _onERC721Received(
 		address _from,
