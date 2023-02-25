@@ -110,7 +110,7 @@ It is important to consider all security risks when coding a smart contract, suc
 ```
 function mint() public {
 	_eoaOnly();
-	
+
 	/// Mint logic
 
 	_safeMint(msg.sender);
