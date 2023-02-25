@@ -42,7 +42,7 @@ token
 ├─ ERC721 — "Implementation of the ERC721 standard"
 ```
 
-## NFT Example
+## NFT Smart Contract Example
 
 ```
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -105,13 +105,21 @@ contract NFT is ERC165, Operator, ERC721Metadata {
 
 ## Safety
 
+It is important to consider all security risks when coding a smart contract, such as reentrancy attacks. The ERC721 and ERC20 implementations come with built-in externally owned account (EOA) only checks called `_eoaOnly()`, which should be used in most cases for public mint functions. Here is an example using an ERC721 implementation:
+
+```
+function mint() public {
+	_eoaOnly();
+	
+	/// Mint logic
+
+	_safeMint(msg.sender);
+}
+```
+
+Stable versions of this software begin at version 10.0.0. **Only use version 10.0.0 or later for production**. **ALWAYS** review contracts before using as they are not audited.
+
 This is **experimental software** and is provided on an "as is" and "as available" basis.
-
-These contracts are **not designed with user safety** in mind:
-
-- There are implicit invariants these contracts expect to hold.
-- **You can easily shoot yourself in the foot if you're not careful.**
-- You should thoroughly read each contract you plan to use top to bottom.
 
 We **do not give any warranties** and **will not be liable for any loss** incurred through any use of this codebase.
 
