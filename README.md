@@ -49,9 +49,9 @@ token
 
 pragma solidity ^0.8.4;
 
-import "../supports/ERC165.sol";
-import "../auth/extensions/Operator.sol";
-import "../token/metadata/ERC721Metadata.sol";
+import "@0xver/solver/supports/ERC165.sol";
+import "@0xver/solver/auth/extensions/Operator.sol";
+import "@0xver/solver/token/metadata/ERC721Metadata.sol";
 
 contract NFT is ERC165, Operator, ERC721Metadata {
 	error QuantityLimit(
